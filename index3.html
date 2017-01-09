@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title> England and Wales Crime Stats before and after BREXIT Referendum </title>
+
+<meta charset="UTF-8">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="css/libs/dc.css"/>
+</head>
+<body>
+
+<div class="container">
+<style>
+#crime-types-chart text{
+	fill: black;
+}
+</style>
+
+    <h3>England and Wales Crime Stats before and after BREXIT Referendum</h3>
+    <div class="row">
+        <div class="col-sm-6">
+            <div id="uk-chart">
+                <strong>Crime incidents by County (color: total number of crimes)</strong>
+				<div class="reset" style="visibility: hidden;">Selected: <span class="filter"></span>
+				  <a href="javascript:usChart.filterAll();dc.redrawAll();">reset</a>
+				</div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div id="crime-types-chart">
+                <strong>Types of crime</strong>
+				<!--<div class="reset" style="visibility: hidden;">Selected: <span class="filter"></span>
+				  <a href="javascript:crimeTypesChart.filterAll();dc.redrawAll();">reset</a>
+				</div>-->
+            </div>
+            <div id="crime-by-month" style="padding-top: 20px;">
+                <strong>Crime incidents by month</strong>
+            </div>
+        </div>
+    </div>
+
+
+    <div>
+        <a href="javascript:dc.filterAll(); dc.renderAll();">Reset All</a>
+    </div>
+
+    <script   src="https://code.jquery.com/jquery-3.1.1.min.js"
+              integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+              crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/libs/d3.js"></script>
+    <script type="text/javascript" src="js/libs/crossfilter.js"></script>
+    <script type="text/javascript" src="js/libs/dc.js"></script>
+    <script type="text/javascript" src="js/coursework2.js"></script>
+</div>
+
+</body>
+</html>
