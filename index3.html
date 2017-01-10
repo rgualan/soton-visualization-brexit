@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <link rel="stylesheet" href="css/libs/dc.css"/>
 <link rel="stylesheet" href="libs/keen-dashboard/keen-dashboards.css"/>
-<link rel="stylesheet" href="/css/brexit.css"/>
+<link rel="stylesheet" href="css/brexit.css"/>
 </head>
 
 <body class="">
@@ -91,7 +91,7 @@ div[class^="col-"] {
                 </div>
             </div>
             <div class="chart-notes">
-                This map shows the number of incidents by county.
+                This map shows the difference in crimes incidents between after and before, by county. 
             </div>
         </div>
         <div class="col-sm-6">
@@ -107,8 +107,10 @@ div[class^="col-"] {
             <div class="chart-wrapper">
                 <div class="chart-title">
                     Crime incidents by month
+                    <button id="changePlotsButton">Toggle</button>
                 </div>
-                <div id="crime-by-month" ></div>
+                <div id="crime-by-month"></div>
+                <div id="crime-by-month-2"></div>
                 <div class="chart-notes">
                     Total number of crime incidents by date (Year-Month).
                 </div>  

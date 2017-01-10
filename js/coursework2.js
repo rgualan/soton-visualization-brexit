@@ -128,6 +128,21 @@ $(document).ready(function() {
     initLineChart("crime_svg", data);
   });
 
+  var cbLabels = ["Show composite","Show time line"];
+  $("#changePlotsButton").click(function() {
+    if ( $("#changePlotsButton").text() === cbLabels[0] ){
+      $("#crime-by-month").hide();
+      $("#crime-by-month-2").show();
+      $("#changePlotsButton").text(cbLabels[1]);
+    }else{
+      $("#crime-by-month").show();
+      $("#crime-by-month-2").hide();
+      $("#changePlotsButton").text(cbLabels[0]);
+    }
+  });
+
+  $("#changePlotsButton").text(cbLabels[0]);
+
 });
 
 
