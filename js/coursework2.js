@@ -82,6 +82,44 @@ function initLineChart(svgName, data){
     .style("text-anchor", "end")
     .text("Hate crimes");
 
+  svg.append("text")
+    .attr("fill", "#000")
+    //.attr("transform", "rotate(-90)")
+    .attr("y", 76)
+    .attr("x", 800)
+    .attr("dy", "0.71em")
+    .style("text-anchor", "end")
+    .text("BREXIT");
+
+  var defs = svg.append("defs")
+
+  defs.append("marker")
+      .attr({
+        "id":"arrow",
+        "viewBox":"0 -5 10 10",
+        "refX":5,
+        "refY":0,
+        "markerWidth":4,
+        "markerHeight":4,
+        "orient":"auto"
+      })
+      .append("path")
+        .attr("d", "M0,-5L10,0L0,5")
+        .attr("class","arrowHead");
+
+  /*var width = 100;
+  var height = 50;
+  var margin = 10;
+  svg.append('line')
+        .attr({
+          "class":"arrow",
+          "marker-end":"url(#" + type[Math.round(Math.random())] + ")",
+          "x1":width/2,
+          "y1":height/2,
+          "x2":margin + Math.random()*(width-margin*2),
+          "y2":margin + Math.random()*(height-margin*2)
+        });*/
+
 }
 
 $(document).ready(function() {
@@ -183,7 +221,7 @@ d3.csv("data/crimedata3.csv", function (data) {
             .title(function (d) {
                 var incidents = "NA";
                 if (d.value) incidents = numberFormat(d.value);
-                return "State: " + d.key + "\nTotal Crime Incidents: " + incidents; //+"M";
+                return "State: " + d.key + "\nChange in crime incidents: " + incidents; //+"M";
             })
 			      .controlsUseVisibility(true)
             //.legend(dc.legend().x(10).y(10).itemHeight(13).gap(5))
@@ -201,8 +239,11 @@ d3.csv("data/crimedata3.csv", function (data) {
         usChart.on("preRedraw", function(chart) {
             chart.colorDomain(abs_min_max(chart));
         });
+        usChart.on("postRender", function(chart) {
+            createLegend(chart.colorDomain());
+        });
         usChart.on("postRedraw", function(chart) {
-            createLegend(d3.extent(chart.data(), chart.valueAccessor()));
+            createLegend(chart.colorDomain());
         });
 
         crimeTypesChart
@@ -345,3 +386,67 @@ d3.csv("data/crimedata3.csv", function (data) {
 
     });
 });
+
+
+// Inspired on http://bl.ocks.org/mbostock/4060606 
+function createLegend(domainArray){ 
+  //console.log(domainArray); 
+  var formatSi = d3.format(".3s"); 
+ 
+  var color = d3.scale.quantize() 
+    .domain(domainArray) 
+    .range(["#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#fddbc7", "#f4a582", "#d6604d", "#b2182b"]) 
+ 
+  // Create a legend for the map 
+  var x = d3.scale.linear() 
+      .domain(domainArray) 
+      .range([600, 860]); 
+ 
+  var svg = d3.select("#uk-chart svg"); 
+ 
+  var legendAxis = d3.svg.axis() 
+  .scale(x) 
+  .tickSize(13) 
+  .tickFormat(function(x, i) { return formatSi(x); }) 
+  .ticks(3); 
+ 
+ 
+  if ( svg.select(".key").empty() ) { 
+ 
+    var g = svg.append("g") 
+      .attr("class", "key") 
+      .attr("transform", "translate(-350,690)"); 
+    g.selectAll("rect") 
+      .data(color.range().map(function(d) { 
+          d = color.invertExtent(d); 
+          if (d[0] == null) d[0] = x.domain()[0]; 
+          if (d[1] == null) d[1] = x.domain()[1]; 
+          return d; 
+        })) 
+      .enter().append("rect") 
+        .attr("height", 8) 
+        .attr("x", function(d) { return x(d[0]); }) 
+        .attr("width", function(d) { return x(d[1]) - x(d[0]); }) 
+        .attr("fill", function(d) { return color(d[0]); }) 
+        .attr("stroke", "white"); 
+    g.append("text") 
+      .attr("class", "caption") 
+      .attr("x", x.range()[0]) 
+      .attr("y", -6) 
+      .attr("fill", "#000") 
+      .attr("text-anchor", "start") 
+      .attr("font-weight", "bold") 
+      .text("Legend"); 
+ 
+    g.call(legendAxis); 
+    g.select(".domain").remove(); 
+  }else{ 
+ 
+    svg.transition().select(".key") 
+      .duration(300) 
+      .call(legendAxis);  
+ 
+    svg.select(".key").select(".domain").remove(); 
+  } 
+ 
+} 
