@@ -7,11 +7,11 @@ var crimeTypesChart = dc.rowChart("#crime-types-chart");
 var crimeByMonth = dc.lineChart("#crime-by-month");
 
 function queryInitialData(cb) { 
-  dateFormat = d3.time.format("%b-%y");
+  var dateFormat2 = d3.time.format("%b-%y");
    
   d3.csv('data/crimeRates.csv', function(data) { 
     data.forEach( function(d) {
-      d.date = dateFormat.parse(d.date); 
+      d.date = dateFormat2.parse(d.date); 
       d.crimes = +d.crimes; 
     }); 
 
@@ -86,7 +86,7 @@ function initLineChart(svgName, data){
     .attr("fill", "#000")
     //.attr("transform", "rotate(-90)")
     .attr("y", 76)
-    .attr("x", 800)
+    .attr("x", 825)
     .attr("dy", "0.71em")
     .style("text-anchor", "end")
     .text("BREXIT");
