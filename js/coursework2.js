@@ -293,28 +293,18 @@ d3.csv("data/crimedata3.csv", function (data) {
         var svg = d3.select("#crime-by-month svg g.chart-body");
         //console.log(svg);
 
-        svg.append("g")
-
-
         svg.append("line")
+            .attr("class", "brexitLine")
             .attr("x1", x(brexitDate))  
             .attr("y1", 0)
             .attr("x2", x(brexitDate))  
             .attr("y2", height-50) //500-30
-            .style("stroke-width", 2)
-            .style("stroke-dasharray","5,5")//dashed array for line
-            .style("stroke", "grey")
-            .style("fill", "none");
 
         svg.append("text")
-          //.attr("x", x(brexitDate))
-          //.attr("y", (height-50)/2)
           .attr("dy", ".35em")
-          //.attr("transform", "")
           .attr("transform", "translate(375,125)rotate(-90)")
           .style("text-anchor", "middle")
           .text("BREXIT Referendum")
-
           ;
       
       });

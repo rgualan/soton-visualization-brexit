@@ -4,9 +4,10 @@
     fill: none;
 }
 
-#crime_svg .brexitLine { 
+.brexitLine { 
     stroke: grey;
-    stroke-width: 1;
+    stroke-dasharray: 3,3;
+    stroke-width: 2;
     fill: none;
 }
 
