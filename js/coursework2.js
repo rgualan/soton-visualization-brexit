@@ -529,7 +529,7 @@ d3.csv("data/crimedata3.csv", function (data) {
             .attr("dy", ".35em")
             .attr("transform", "translate("+(x(brexitDate)-10)+",125)rotate(-90)")
             .style("text-anchor", "middle")
-            .text("BREXIT Referendum")
+            .text("BREXIT Referendum (2016)")
             ;
 
           // Trick for hiding the year 1900
