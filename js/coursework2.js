@@ -160,7 +160,7 @@ d3.csv("data/crimedata3.csv", function (data) {
         d.month = dateFormat.parse(d.month);
         d.count = +d.count;
     });
-    console.log(data.slice(0,10));
+    //console.log(data.slice(0,10));
 
     //var data = crossfilter(data.slice(0,1000));
     var ndx = crossfilter(data);
@@ -477,13 +477,13 @@ d3.csv("data/crimedata3.csv", function (data) {
                 .colors('red')
                 .group(crimeSumGroupin2016, "Year 2016")
                 .valueAccessor(function(d) {
-                  return d.value.totalCrimeCount;}
-                )
+                  return d.value.totalCrimeCount;
+                })
                 .title(function (d) {
-                 var incidents = numberFormat(d.value.totalCrimeCount);
-                    return "Month: " + format(d.key) 
-                        //+ "\nCrime type: " + crimeTypesChart.filter() 
-                        + "\nIncidents: " + incidents;
+                  console.log(d);
+                  var incidents = numberFormat(d.value.totalCrimeCount);
+                  return "Month: " + d3.time.format("%m")(d.key) 
+                      +  "\nIncidents: " + incidents;
                  })  
                 .dashStyle([2,2]),
             dc.lineChart(crimeByMonth2)
@@ -494,31 +494,45 @@ d3.csv("data/crimedata3.csv", function (data) {
                   return d.value.totalCrimeCount;
                 })
                 .title(function (d) {
-                  /*var format = d3.time.format("%m");
-                  var type = crimeTypesChart.filter();
-                  if (type){
-                      var incidents = numberFormat(d.value.totalCrimeCount);
-                      return "Month: " + format(d.key) 
-                          + "\nCrime type: " + crimeTypesChart.filter() 
-                          + "\nIncidents: " + incidents;
-                  }else{
-                      var sum = 0;
-                      $.each(d.value, function(key, row) { 
-                          //console.log(key);
-                          //console.log(row);
-                          sum += row;       
-                      }); 
-
-                      var incidents = numberFormat(sum);
-                      return "Month: " + format(d.key) 
-                          + "\nTolal # of incidents: " + incidents;
-                      }*/
+                  var incidents = numberFormat(d.value.totalCrimeCount);
+                  return "Month: " + d3.time.format("%m")(d.key) 
+                      +  "\nIncidents: " + incidents;
                 })
                 .dashStyle([5,5])
           ])
           .elasticY(true)
           .colors(d3.scale.category20c())
           ;
+
+        crimeByMonth2.on("postRender", function(chart) {
+
+          // Plot vertical line for BREXIT
+          var brexitDate = new Date("1900-06-23");
+          //brexitDate = new Date("1900-10-01");
+          //console.log(brexitDate);
+
+          var x = d3.time.scale()
+              .domain([minDate2, maxDate2])
+              //.range([-13, width-66]); //800-66
+              .range([0, width-71]); //800-66
+
+          var svg = d3.select("#crime-by-month-2 svg g.chart-body");
+
+          svg.append("line")
+              .attr("class", "brexitLine")
+              .attr("x1", x(brexitDate))
+              .attr("y1", 0)
+              .attr("x2", x(brexitDate))
+              .attr("y2", height-50) 
+
+          svg.append("text")
+            .attr("dy", ".35em")
+            .attr("transform", "translate("+(x(brexitDate)-10)+",125)rotate(-90)")
+            .style("text-anchor", "middle")
+            .text("BREXIT Referendum")
+            ;
+        });
+
 
         dc.renderAll();
 
