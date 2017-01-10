@@ -5,6 +5,8 @@ var usChart = dc.geoChoroplethChart("#uk-chart");
 //var crimesTimelineChart = dc.lineChart("#crimes-timeline-chart");
 var crimeTypesChart = dc.rowChart("#crime-types-chart");
 var crimeByMonth = dc.lineChart("#crime-by-month");
+var crimeByMonth2 = dc.compositeChart("#crime-by-month-2");
+
 
 function queryInitialData(cb) {
   var dateFormat2 = d3.time.format("%b-%y");
@@ -141,7 +143,8 @@ $(document).ready(function() {
     }
   });
 
-  $("#changePlotsButton").text(cbLabels[0]);
+  $("#changePlotsButton").text(cbLabels[1]);
+  $("#crime-by-month").hide();
 
 });
 
@@ -152,14 +155,18 @@ $(document).ready(function() {
 d3.csv("data/crimedata3.csv", function (data) {
     data.forEach(function(d) {
         d.county = d.county.toUpperCase();
+        d.yearNumber = d.month.split("-")[0]; //d3.time.format("%y").parse(d.month.split("-")[1]);
+        d.monthNumber = d3.time.format("%m").parse(d.month.split("-")[1]);
         d.month = dateFormat.parse(d.month);
         d.count = +d.count;
     });
+    console.log(data.slice(0,10));
 
     //var data = crossfilter(data.slice(0,1000));
     var ndx = crossfilter(data);
 
     var monthDimension = ndx.dimension(function(d) {return d.month;});
+    var monthDimension2 = ndx.dimension(function(d) {return d.monthNumber;});
     // Filter values for the period 02/2016 - 12/2016 (5 months before BRexit and 5 months after)
     // monthDimension.filterRange([new Date('2016-2'), new Date('2016-12')]);
 
@@ -186,6 +193,51 @@ d3.csv("data/crimedata3.csv", function (data) {
       }
     );
 
+    // For the composite chart
+    function isyear2015(v) {
+      return v.yearNumber === "2015" ;
+    }
+    function isyear2016(v) {
+      return v.yearNumber === "2016" ;
+    }
+    var crimeSumGroupin2016 = monthDimension2.group().reduce(
+      function(p, v) {
+        if (isyear2016(v)) {
+          p.totalCrimeCount +=  +v.count;  
+        }
+        return p;
+      }, 
+      function(p, v) {
+        if (isyear2016(v)) {
+          p.totalCrimeCount -=  +v.count;
+        }
+        return p;}, 
+      function() {
+        return {totalCrimeCount:0};
+      }
+    );
+     
+    var crimeSumGroupin2015 = monthDimension2.group().reduce(
+      function(p, v) {
+        if (isyear2015(v)) {
+          p.totalCrimeCount +=  +v.count;  
+        }
+        return p;
+      }, 
+      function(p, v) {
+        if (isyear2015(v)) {
+          p.totalCrimeCount -=  +v.count;
+        }
+        return p;
+      }, 
+      function() {
+        return {totalCrimeCount:0};
+      }
+    );
+    //console.log(crimeSumGroupin2015);
+
+
+    // Crime types
     var crimeTypes = ndx.dimension(function(d) {
         return d["crimeType"];
     });
@@ -246,11 +298,11 @@ d3.csv("data/crimedata3.csv", function (data) {
             //.legend(dc.legend().x(10).y(10).itemHeight(13).gap(5))
 			       ;
 
-      var abs_min_max = function(chart){
-        var min_max = d3.extent(chart.data(), chart.valueAccessor());
-        var value = Math.max(Math.abs(min_max[0]),Math.abs(min_max[1]));
-        return [-value,0,value];
-      };
+        var abs_min_max = function(chart){
+          var min_max = d3.extent(chart.data(), chart.valueAccessor());
+          var value = Math.max(Math.abs(min_max[0]),Math.abs(min_max[1]));
+          return [-value,0,value];
+        };
 
         usChart.on("preRender", function(chart) {
             chart.colorDomain(abs_min_max(chart));
@@ -369,36 +421,104 @@ d3.csv("data/crimedata3.csv", function (data) {
 
         //crimeByMonth.render();
 
-      crimeByMonth.on("postRender", function(chart) {
+        crimeByMonth.on("postRender", function(chart) {
 
-        // Plot vertical line for BREXIT
-        var brexitDate = new Date("2016-06-23");
-        //var brexitDate = new Date("2016-04-01");
-        //console.log(brexitDate);
+          // Plot vertical line for BREXIT
+          var brexitDate = new Date("2016-06-23");
+          //var brexitDate = new Date("2016-04-01");
+          //console.log(brexitDate);
 
-        var x = d3.time.scale()
-            .domain([minDate, maxDate])
-            .range([-13, width-66]); //800-66
+          var x = d3.time.scale()
+              .domain([minDate, maxDate])
+              .range([-13, width-66]); //800-66
 
 
-        var svg = d3.select("#crime-by-month svg g.chart-body");
-        //console.log(svg);
+          var svg = d3.select("#crime-by-month svg g.chart-body");
+          //console.log(svg);
 
-        svg.append("line")
-            .attr("class", "brexitLine")
-            .attr("x1", x(brexitDate))
-            .attr("y1", 0)
-            .attr("x2", x(brexitDate))
-            .attr("y2", height-50) //500-30
+          svg.append("line")
+              .attr("class", "brexitLine")
+              .attr("x1", x(brexitDate))
+              .attr("y1", 0)
+              .attr("x2", x(brexitDate))
+              .attr("y2", height-50) //500-30
 
-        svg.append("text")
-          .attr("dy", ".35em")
-          .attr("transform", "translate(375,125)rotate(-90)")
-          .style("text-anchor", "middle")
-          .text("BREXIT Referendum")
+          svg.append("text")
+            .attr("dy", ".35em")
+            .attr("transform", "translate(375,125)rotate(-90)")
+            .style("text-anchor", "middle")
+            .text("BREXIT Referendum")
+            ;
+
+        });
+
+
+        var width = 550, height = 300;
+        var minDate2 = monthDimension2.bottom(1)[0]["monthNumber"]; 
+        //var maxDate2 = monthDimension2.top(1)[0]["monthNumber"];
+        var maxDate2 = d3.time.format("%m").parse("11");
+
+        crimeByMonth2
+          .width(width)
+          .height(height)
+          .transitionDuration(750)
+          .x(d3.time.scale().domain([minDate2, maxDate2]))
+          .round(d3.time.month.round)
+          .xUnits(d3.time.months)
+          .margins({left: 50, top: 10, right: 10, bottom: 30})
+          .brushOn(false)
+          .clipPadding(10)
+          .legend(dc.legend().x(80).y(180).itemHeight(13).gap(5))
+          .xAxisLabel("Month")
+          .yAxisLabel("Number of incidents")
+          .compose([
+            dc.lineChart(crimeByMonth2)
+                .dimension(monthDimension2)
+                .colors('red')
+                .group(crimeSumGroupin2016, "Year 2016")
+                .valueAccessor(function(d) {
+                  return d.value.totalCrimeCount;}
+                )
+                .title(function (d) {
+                 var incidents = numberFormat(d.value.totalCrimeCount);
+                    return "Month: " + format(d.key) 
+                        //+ "\nCrime type: " + crimeTypesChart.filter() 
+                        + "\nIncidents: " + incidents;
+                 })  
+                .dashStyle([2,2]),
+            dc.lineChart(crimeByMonth2)
+                .dimension(monthDimension2)
+                .colors('blue')
+                .group(crimeSumGroupin2015, "Year 2015")
+                .valueAccessor(function(d) {
+                  return d.value.totalCrimeCount;
+                })
+                .title(function (d) {
+                  /*var format = d3.time.format("%m");
+                  var type = crimeTypesChart.filter();
+                  if (type){
+                      var incidents = numberFormat(d.value.totalCrimeCount);
+                      return "Month: " + format(d.key) 
+                          + "\nCrime type: " + crimeTypesChart.filter() 
+                          + "\nIncidents: " + incidents;
+                  }else{
+                      var sum = 0;
+                      $.each(d.value, function(key, row) { 
+                          //console.log(key);
+                          //console.log(row);
+                          sum += row;       
+                      }); 
+
+                      var incidents = numberFormat(sum);
+                      return "Month: " + format(d.key) 
+                          + "\nTolal # of incidents: " + incidents;
+                      }*/
+                })
+                .dashStyle([5,5])
+          ])
+          .elasticY(true)
+          .colors(d3.scale.category20c())
           ;
-
-      });
 
         dc.renderAll();
 
