@@ -1,41 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title> England and Wales Crime Stats before and after BREXIT Referendum </title>
+<title> England and Wales Crime Stats before and after the BREXIT Referendum </title>
 
 <meta charset="UTF-8">
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <link rel="stylesheet" href="css/libs/dc.css"/>
+<link rel="stylesheet" href="libs/keen-dashboard/keen-dashboards.css"/>
+<link rel="stylesheet" href="/css/brexit.css"/>
 </head>
-<body>
 
-<div class="container">
+<body class="">
 <style>
 #crime-types-chart text{
-	fill: black;
+    fill: black;
+}
+
+div[class^="col-"] {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 </style>
+<div class="container">
 
-    <h3>England and Wales Crime Stats before and after BREXIT Referendum</h3>
+    <h2>England and Wales Crime Stats before and after BREXIT Referendum</h2>
+
+    <h3>Brexit</h3>
+    The United Kingdom's withdrawal from the European Union is widely known as Brexit, a portmanteau of "British exit". Following a referendum held on <b>23 June 2016</b> in which 52% of votes were cast in favour of leaving the EU, the UK government intends to invoke Article 50 of the Treaty on European Union, the formal procedure for withdrawing, by the end of March 2017. This, within the treaty terms, would put the UK on a course to leave the EU by March 2019.
+    
     <div class="row">
-        <div class="col-sm-6">
-            <div id="uk-chart">
-                <strong>Crime incidents by County (color: total number of crimes)</strong>
-				<div class="reset" style="visibility: hidden;">Selected: <span class="filter"></span>
-				  <a href="javascript:usChart.filterAll();dc.redrawAll();">reset</a>
-				</div>
+    <div class="col-md-6 col-md-offset-3 chart-wrapper">
+        <div class="chart-title">
+            United Kingdom in the European Union
+        </div>
+        <div >
+            <img src="img/UK_location_in_the_EU_2016.svg" alt="Brexit image" style="">        
+        </div>
+        <div class="chart-notes">
+            The UK in blue and the EU in blue.
+        </div>
+    </div>
+    </div>
+    
+    <h3> Inmediate effects of the BREXIT Referendum</h3>
+
+    Only one month after the BREXIT Referendum several <a url="https://www.theguardian.com/politics/2016/jul/22/one-month-on-what-is-the-impact-of-the-brexit-vote-so-far">effects</a> were reported, three of the most important were: (1) The FTSE 100 shrugged off, (2) the value of pound collapsed, and (3) Reported incidents of race hate crimes increased considerable the week before and the week after the vote to leave the EU.
+
+    <div class="row">
+    <!--<div class="col-md-6 col-md-offset-3 chart-wrapper">-->
+    <div class="col-md-11 chart-wrapper">
+        <div class="chart-title">
+            Crime rates seems to have been increased before and after the BREXIT Referendum.
+        </div>
+        <div >
+            <svg id='crime_svg'>
+        </div>
+        <div class="chart-notes">
+            Put some additional information here.
+        </div>
+    </div>
+    </div>  
+
+
+    <h3> Exploring (Street?) Crime Incidents in England and Wales before and after BREXIT</h3>
+
+    Since BREXIT seems to have had a direct effect over Hate Crimes, this kind of crime maybe is not the only one evidencing some effect related with the vote for leaving the EU. The next Dynamic Data Visualization allows to explore Crime Incidents by County and by Type of Crime.  
+
+    <div class="row">
+        <div class="col-sm-6 chart-wrapper">
+            <div class="chart-title">
+                Crime incidents by County (color: total number of crimes)
+            </div>
+            <div id="uk-chart" class="">
+                <div class="reset" style="visibility: hidden;">Selected: <span class="filter"></span>
+                  <a href="javascript:usChart.filterAll();dc.redrawAll();">reset</a>
+                </div>
+            </div>
+            <div class="chart-notes">
+                This map shows the number of incidents by county.
             </div>
         </div>
         <div class="col-sm-6">
-            <div id="crime-types-chart">
-                <strong>Types of crime</strong>
-				<!--<div class="reset" style="visibility: hidden;">Selected: <span class="filter"></span>
-				  <a href="javascript:crimeTypesChart.filterAll();dc.redrawAll();">reset</a>
-				</div>-->
+            <div class="chart-wrapper">
+                <div class="chart-title">
+                    Types of crime
+                </div>
+				<div id="crime-types-chart"></div>
+                <div class="chart-notes">
+                    Total number of crime incidents by crime type.
+                </div>  
             </div>
-            <div id="crime-by-month" style="padding-top: 20px;">
-                <strong>Crime incidents by month</strong>
+            <div class="chart-wrapper">
+                <div class="chart-title">
+                    Crime incidents by month
+                </div>
+                <div id="crime-by-month" ></div>
+                <div class="chart-notes">
+                    Total number of crime incidents by date (Year-Month).
+                </div>  
             </div>
         </div>
     </div>

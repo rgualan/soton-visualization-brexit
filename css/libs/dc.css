@@ -2,8 +2,9 @@
   fill-opacity: 0.5;
   stroke-opacity: 0.5; }
 
-div.dc-chart {
-  float: left; }
+/*div.dc-chart {
+  float: left; 
+}*/
 
 .dc-chart rect.bar {
   stroke: none;
