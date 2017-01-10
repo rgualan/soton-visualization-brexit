@@ -1,10 +1,10 @@
-#crime_svg path.line { 
+#crime_svg path.line {
     stroke: steelblue;
     stroke-width: 1;
     fill: none;
 }
 
-.brexitLine { 
+.brexitLine {
     stroke: grey;
     stroke-dasharray: 3,3;
     stroke-width: 2;
@@ -21,4 +21,59 @@
 
 svg text {
 	/*font-size: 20px;*/
+}
+
+nav.smartscroll-controls {
+	position: fixed;
+	top: 50%;
+	left: 0;
+}
+
+
+nav.smartscroll-controls > a {
+	display: block;
+	margin: 15px;
+}
+
+nav.smartscroll-controls > a.prev {
+	border-color: #333333;
+    border-style: solid none none solid;
+    border-width: 2px;
+    width: 30px;
+    height: 30px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+nav.smartscroll-controls > a.next {
+    border-color: #333333;
+    border-style: none solid solid none;
+    border-width: 2px;
+    width: 30px;
+    height: 30px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+/* BACK TO TOP ANCHOR */
+a.smartscroll-totop {
+	position: fixed;
+	bottom: 15px;
+	right: 25px;
+	border-color: #333333;
+    border-style: solid none none solid;
+    border-width: 2px;
+    width: 30px;
+    height: 30px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
 }
