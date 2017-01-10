@@ -98,16 +98,36 @@ $(document).ready(function() {
 
 d3.csv("data/crimedata3.csv", function (data) {
     data.forEach(function(d) {
-        d.county = d.county.toUpperCase();            
+        d.county = d.county.toUpperCase();
         d.month = dateFormat.parse(d.month);
-        d.count = +d.count; 
+        d.count = +d.count;
     });
 
     //var data = crossfilter(data.slice(0,1000));
     var ndx = crossfilter(data);
 
+    var monthDimension = ndx.dimension(function(d) {return d.month;});
+    // Filter values for the period 02/2016 - 12/2016 (5 months before BRexit and 5 months after)
+    monthDimension.filterRange([new Date('2016-2'), new Date('2016-12')]);
+
     var counties = ndx.dimension(function (d) { return d["county"]; });
+
     var countyCrimesSum = counties.group().reduceSum(function (d) { return d["count"]; });
+    var countyCrimesDiff = counties.group().reduce(
+      function (p, v) {
+        if(v.month > new Date('2016-6')){ return p + v.count; }
+        else{ return p - v.count; }
+      },
+
+      function (p, v) {
+        if(v.month > new Date('2016-6')){ return p - v.count; }
+        else{ return p + v.count; }
+      },
+
+      function () {
+        return 0;
+      }
+    );
 
     var crimeTypes = ndx.dimension(function(d) {
         return d["crimeType"];
@@ -118,7 +138,8 @@ d3.csv("data/crimedata3.csv", function (data) {
         }
     );
 
-    var monthDimension = ndx.dimension(function(d) {return d.month;});
+
+
     var crimeSumGroup = monthDimension.group().reduce(function(p, v) {
           p[v.crimeType] = (p[v.crimeType] || 0) + v.count;
           return p;
@@ -142,12 +163,19 @@ d3.csv("data/crimedata3.csv", function (data) {
         usChart.width(550)
             .height(754)//720
             .dimension(counties)
-            .group(countyCrimesSum)
+            .group(countyCrimesDiff)
             //.colors(d3.scale.quantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"]))
-            .colors(d3.scale.quantize().range(["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d"]))
-            //.colorDomain([0, 500000])
-            //.colorDomain(d3.extent(chart.data(), chart.valueAccessor()))
+            // .colorDomain([-100000,100000])
+            // .colors(["#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#fff", "#fddbc7", "#f4a582", "#d6604d", "#b2182b"])
+            // .linearColors(["#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#fff", "#fddbc7", "#f4a582", "#d6604d", "#b2182b"])
+            // .colors(d3.scale.linear().range(["blue","white", "red"]))
+            .colors(d3.scale.quantize().range(["#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#fddbc7", "#f4a582", "#d6604d", "#b2182b"]))
+
+            // .colors(d3.scale.quantize().range(["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d"]))
+
+            // .colorDomain(d3.extent(usChart.data(), usChart.valueAccessor()))
             .colorCalculator(function (d) { return d ? usChart.colors()(d) : '#ccc'; })
+            // .colorAccessor(function(d, i){ console.log(d); return d; })
             .overlayGeoJson(statesJson.features, "state", function (d) {
                 return d.properties.NAME_2.toUpperCase();
             })
@@ -161,14 +189,17 @@ d3.csv("data/crimedata3.csv", function (data) {
             //.legend(dc.legend().x(10).y(10).itemHeight(13).gap(5))
 			       ;
 
+      var abs_min_max = function(chart){
+        var min_max = d3.extent(chart.data(), chart.valueAccessor());
+        var value = Math.max(Math.abs(min_max[0]),Math.abs(min_max[1]));
+        return [-value,0,value];
+      };
+
         usChart.on("preRender", function(chart) {
-            chart.colorDomain(d3.extent(chart.data(), chart.valueAccessor()));
+            chart.colorDomain(abs_min_max(chart));
         });
         usChart.on("preRedraw", function(chart) {
-            chart.colorDomain(d3.extent(chart.data(), chart.valueAccessor()));
-        });        
-        usChart.on("postRender", function(chart) {
-            createLegend(d3.extent(chart.data(), chart.valueAccessor()));
+            chart.colorDomain(abs_min_max(chart));
         });
         usChart.on("postRedraw", function(chart) {
             createLegend(d3.extent(chart.data(), chart.valueAccessor()));
@@ -217,14 +248,14 @@ d3.csv("data/crimedata3.csv", function (data) {
                       "Theft from the person",
                       "Vehicle crime",
                       "Violence and sexual offences"];
-            
+
         function sel_stack(type) {
           return function(d) {
               return d.value[type];
           };
         }
 
-        var minDate = monthDimension.bottom(1)[0]["month"]; 
+        var minDate = monthDimension.bottom(1)[0]["month"];
         var maxDate = monthDimension.top(1)[0]["month"];
 
         var width = 550,
@@ -255,19 +286,19 @@ d3.csv("data/crimedata3.csv", function (data) {
                 var type = crimeTypesChart.filter();
                 if (type){
                     var incidents = numberFormat(d.value[type]);
-                    return "Month: " + format(d.key) 
-                        + "\nCrime type: " + crimeTypesChart.filter() 
+                    return "Month: " + format(d.key)
+                        + "\nCrime type: " + crimeTypesChart.filter()
                         + "\nIncidents: " + incidents;
                 }else{
                     var sum = 0;
-                    $.each(d.value, function(key, row) { 
+                    $.each(d.value, function(key, row) {
                         //console.log(key);
                         //console.log(row);
-                        sum += row;       
-                    }); 
+                        sum += row;
+                    });
 
                     var incidents = numberFormat(sum);
-                    return "Month: " + format(d.key) 
+                    return "Month: " + format(d.key)
                         + "\nTolal # of incidents: " + incidents;
                     }
             })
@@ -284,11 +315,11 @@ d3.csv("data/crimedata3.csv", function (data) {
         var brexitDate = new Date("2016-06-23");
         //var brexitDate = new Date("2016-04-01");
         //console.log(brexitDate);
-        
+
         var x = d3.time.scale()
             .domain([minDate, maxDate])
             .range([-13, width-66]); //800-66
-        
+
 
         var svg = d3.select("#crime-by-month svg g.chart-body");
         //console.log(svg);
@@ -297,7 +328,7 @@ d3.csv("data/crimedata3.csv", function (data) {
             .attr("class", "brexitLine")
             .attr("x1", x(brexitDate))  
             .attr("y1", 0)
-            .attr("x2", x(brexitDate))  
+            .attr("x2", x(brexitDate))
             .attr("y2", height-50) //500-30
 
         svg.append("text")
@@ -314,67 +345,3 @@ d3.csv("data/crimedata3.csv", function (data) {
 
     });
 });
-
-// Inspired on http://bl.ocks.org/mbostock/4060606
-function createLegend(domainArray){
-  //console.log(domainArray);
-  var formatSi = d3.format(".3s");
-
-  var color = d3.scale.quantize()
-    .domain(domainArray)
-    .range(["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d"])
-
-  // Create a legend for the map
-  var x = d3.scale.linear()
-      .domain(domainArray)
-      .range([600, 860]);
-
-  var svg = d3.select("#uk-chart svg");
-
-  var legendAxis = d3.svg.axis()
-  .scale(x)
-  .tickSize(13)
-  .tickFormat(function(x, i) { return formatSi(x); })
-  .ticks(3);
-
-
-  if ( svg.select(".key").empty() ) {
-
-    var g = svg.append("g")
-      .attr("class", "key")
-      .attr("transform", "translate(-350,690)");
-    g.selectAll("rect")
-      .data(color.range().map(function(d) {
-          d = color.invertExtent(d);
-          if (d[0] == null) d[0] = x.domain()[0];
-          if (d[1] == null) d[1] = x.domain()[1];
-          return d;
-        }))
-      .enter().append("rect")
-        .attr("height", 8)
-        .attr("x", function(d) { return x(d[0]); })
-        .attr("width", function(d) { return x(d[1]) - x(d[0]); })
-        .attr("fill", function(d) { return color(d[0]); })
-        .attr("stroke", "white");
-    g.append("text")
-      .attr("class", "caption")
-      .attr("x", x.range()[0])
-      .attr("y", -6)
-      .attr("fill", "#000")
-      .attr("text-anchor", "start")
-      .attr("font-weight", "bold")
-      .text("Legend");
-
-    g.call(legendAxis);
-    g.select(".domain").remove();
-  }else{
-
-    svg.transition().select(".key")
-      .duration(300)
-      .call(legendAxis); 
-
-    svg.select(".key").select(".domain").remove();
-  }
-
-}
-
