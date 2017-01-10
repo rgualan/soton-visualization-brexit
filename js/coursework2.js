@@ -531,7 +531,18 @@ d3.csv("data/crimedata3.csv", function (data) {
             .style("text-anchor", "middle")
             .text("BREXIT Referendum")
             ;
+
+          // Trick for hiding the year 1900
+          svg = d3.select("#crime-by-month-2 svg g.axis.x");
+          svg.append("rect")
+            .attr("x", -15)
+            .attr("y", 7)
+            .attr("width", 30)
+            .attr("height", 10)
+            .attr("fill", "white");
+
         });
+
 
 
         dc.renderAll();
