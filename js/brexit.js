@@ -2,11 +2,9 @@ var numberFormat = d3.format(",.0f");
 var dateFormat = d3.time.format("%Y-%m");
 
 var ukChart = dc.geoChoroplethChart("#uk-chart");
-//var crimesTimelineChart = dc.lineChart("#crimes-timeline-chart");
 var crimeTypesChart = dc.rowChart("#crime-types-chart");
 var crimeByMonth = dc.lineChart("#crime-by-month");
 var crimeByMonth2 = dc.compositeChart("#crime-by-month-2");
-
 
 function queryInitialData(cb) {
   var dateFormat2 = d3.time.format("%b-%y");
@@ -18,7 +16,6 @@ function queryInitialData(cb) {
     });
 
     if (data.length == 0){ console.log("No items returned!"); return; }
-    //console.log(data);
 
     cb(data);
   });
@@ -42,7 +39,6 @@ function initLineChart(svgName, data){
 
   // Define the line
   var line = d3.svg.line()
-    //.interpolate("basis")
       .x(function(d) { return x(d.date); })
       .y(function(d) { return y(d.value); });
 
@@ -86,7 +82,6 @@ function initLineChart(svgName, data){
 
   svg.append("text")
     .attr("fill", "#000")
-    //.attr("transform", "rotate(-90)")
     .attr("y", 76)
     .attr("x", 825)
     .attr("dy", "0.71em")
@@ -108,20 +103,6 @@ function initLineChart(svgName, data){
       .append("path")
         .attr("d", "M0,-5L10,0L0,5")
         .attr("class","arrowHead");
-
-  /*var width = 100;
-  var height = 50;
-  var margin = 10;
-  svg.append('line')
-        .attr({
-          "class":"arrow",
-          "marker-end":"url(#" + type[Math.round(Math.random())] + ")",
-          "x1":width/2,
-          "y1":height/2,
-          "x2":margin + Math.random()*(width-margin*2),
-          "y2":margin + Math.random()*(height-margin*2)
-        });*/
-
 }
 
 $(document).ready(function() {
@@ -130,7 +111,7 @@ $(document).ready(function() {
     initLineChart("crime_svg", data);
   });
 
-  var cbLabels = ["Show composite","Show time line"];
+  var cbLabels = ["Show comparison","Show time line"];
   $("#changePlotsButton").click(function() {
     if ( $("#changePlotsButton").text() === cbLabels[0] ){
       $("#crime-by-month").hide();
@@ -149,9 +130,6 @@ $(document).ready(function() {
 });
 
 
-
-
-
 d3.csv("data/crimedata3.csv", function (data) {
     data.forEach(function(d) {
         d.county = d.county.toUpperCase();
@@ -160,15 +138,11 @@ d3.csv("data/crimedata3.csv", function (data) {
         d.month = dateFormat.parse(d.month);
         d.count = +d.count;
     });
-    //console.log(data.slice(0,10));
 
-    //var data = crossfilter(data.slice(0,1000));
     var ndx = crossfilter(data);
 
     var monthDimension = ndx.dimension(function(d) {return d.month;});
     var monthDimension2 = ndx.dimension(function(d) {return d.monthNumber;});
-    // Filter values for the period 02/2016 - 12/2016 (5 months before BRexit and 5 months after)
-    // monthDimension.filterRange([new Date('2016-2'), new Date('2016-12')]);
 
     var counties = ndx.dimension(function (d) { return d["county"]; });
 
@@ -203,39 +177,37 @@ d3.csv("data/crimedata3.csv", function (data) {
     var crimeSumGroupin2016 = monthDimension2.group().reduce(
       function(p, v) {
         if (isyear2016(v)) {
-          p.totalCrimeCount +=  +v.count;  
+          p.totalCrimeCount +=  +v.count;
         }
         return p;
-      }, 
+      },
       function(p, v) {
         if (isyear2016(v)) {
           p.totalCrimeCount -=  +v.count;
         }
-        return p;}, 
+        return p;},
       function() {
         return {totalCrimeCount:0};
       }
     );
-     
+
     var crimeSumGroupin2015 = monthDimension2.group().reduce(
       function(p, v) {
         if (isyear2015(v)) {
-          p.totalCrimeCount +=  +v.count;  
+          p.totalCrimeCount +=  +v.count;
         }
         return p;
-      }, 
+      },
       function(p, v) {
         if (isyear2015(v)) {
           p.totalCrimeCount -=  +v.count;
         }
         return p;
-      }, 
+      },
       function() {
         return {totalCrimeCount:0};
       }
     );
-    //console.log(crimeSumGroupin2015);
-
 
     // Crime types
     var crimeTypes = ndx.dimension(function(d) {
@@ -246,7 +218,6 @@ d3.csv("data/crimedata3.csv", function (data) {
             return d["count"];
         }
     );
-
 
 
     var crimeSumGroup = monthDimension.group().reduce(function(p, v) {
@@ -262,29 +233,15 @@ d3.csv("data/crimedata3.csv", function (data) {
     projection = d3.geo.mercator()
         .center([1, 54])
         .scale(4000);
-        //.translate([990 / 2, 500 / 2]);
 
     d3.json("geo/e_w_adm2.geojson", function (statesJson) {
-
-        //var legend = chart.legend(dc.legend().x(10).y(10).itemHeight(13).gap(5));
-        //legend.legendText(dc.pluck('name'))
 
         ukChart.width(550)
             .height(754)//720
             .dimension(counties)
             .group(countyCrimesDiff)
-            //.colors(d3.scale.quantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"]))
-            // .colorDomain([-100000,100000])
-            // .colors(["#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#fff", "#fddbc7", "#f4a582", "#d6604d", "#b2182b"])
-            // .linearColors(["#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#fff", "#fddbc7", "#f4a582", "#d6604d", "#b2182b"])
-            // .colors(d3.scale.linear().range(["blue","white", "red"]))
             .colors(d3.scale.quantize().range(["#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#fddbc7", "#f4a582", "#d6604d", "#b2182b"]))
-
-            // .colors(d3.scale.quantize().range(["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d"]))
-
-            // .colorDomain(d3.extent(ukChart.data(), ukChart.valueAccessor()))
             .colorCalculator(function (d) { return d ? ukChart.colors()(d) : '#ccc'; })
-            // .colorAccessor(function(d, i){ console.log(d); return d; })
             .overlayGeoJson(statesJson.features, "state", function (d) {
                 return d.properties.NAME_2.toUpperCase();
             })
@@ -294,9 +251,7 @@ d3.csv("data/crimedata3.csv", function (data) {
                 if (d.value) incidents = numberFormat(d.value);
                 return "State: " + d.key + "\nChange in crime incidents: " + incidents; //+"M";
             })
-			      .controlsUseVisibility(true)
-            //.legend(dc.legend().x(10).y(10).itemHeight(13).gap(5))
-			       ;
+			      .controlsUseVisibility(true);
 
         var abs_min_max = function(chart){
           var min_max = d3.extent(chart.data(), chart.valueAccessor());
@@ -392,8 +347,6 @@ d3.csv("data/crimedata3.csv", function (data) {
           .elasticY(true)
           .colors(d3.scale.category20c())
           .title(function (d) {
-                //console.log(crimeTypesChart.filter());
-                //console.log(d);
                 var format = d3.time.format("%Y-%b");
                 var type = crimeTypesChart.filter();
                 if (type){
@@ -404,8 +357,6 @@ d3.csv("data/crimedata3.csv", function (data) {
                 }else{
                     var sum = 0;
                     $.each(d.value, function(key, row) {
-                        //console.log(key);
-                        //console.log(row);
                         sum += row;
                     });
 
@@ -419,14 +370,10 @@ d3.csv("data/crimedata3.csv", function (data) {
         for(var i = 1; i<14; ++i)
           crimeByMonth.stack(crimeSumGroup, i, sel_stack(types[i]));
 
-        //crimeByMonth.render();
-
         crimeByMonth.on("postRender", function(chart) {
 
           // Plot vertical line for BREXIT
           var brexitDate = new Date("2016-06-23");
-          //var brexitDate = new Date("2016-04-01");
-          //console.log(brexitDate);
 
           var x = d3.time.scale()
               .domain([minDate, maxDate])
@@ -434,7 +381,6 @@ d3.csv("data/crimedata3.csv", function (data) {
 
 
           var svg = d3.select("#crime-by-month svg g.chart-body");
-          //console.log(svg);
 
           svg.append("line")
               .attr("class", "brexitLine")
@@ -454,8 +400,7 @@ d3.csv("data/crimedata3.csv", function (data) {
 
 
         var width = 550, height = 300;
-        var minDate2 = monthDimension2.bottom(1)[0]["monthNumber"]; 
-        //var maxDate2 = monthDimension2.top(1)[0]["monthNumber"];
+        var minDate2 = monthDimension2.bottom(1)[0]["monthNumber"];
         var maxDate2 = d3.time.format("%m").parse("11");
 
         crimeByMonth2
@@ -482,9 +427,9 @@ d3.csv("data/crimedata3.csv", function (data) {
                 .title(function (d) {
                   console.log(d);
                   var incidents = numberFormat(d.value.totalCrimeCount);
-                  return "Month: " + d3.time.format("%m")(d.key) 
+                  return "Month: " + d3.time.format("%m")(d.key)
                       +  "\nIncidents: " + incidents;
-                 })  
+                 })
                 .dashStyle([2,2]),
             dc.lineChart(crimeByMonth2)
                 .dimension(monthDimension2)
@@ -495,7 +440,7 @@ d3.csv("data/crimedata3.csv", function (data) {
                 })
                 .title(function (d) {
                   var incidents = numberFormat(d.value.totalCrimeCount);
-                  return "Month: " + d3.time.format("%m")(d.key) 
+                  return "Month: " + d3.time.format("%m")(d.key)
                       +  "\nIncidents: " + incidents;
                 })
                 .dashStyle([5,5])
@@ -508,12 +453,9 @@ d3.csv("data/crimedata3.csv", function (data) {
 
           // Plot vertical line for BREXIT
           var brexitDate = new Date("1900-06-23");
-          //brexitDate = new Date("1900-10-01");
-          //console.log(brexitDate);
 
           var x = d3.time.scale()
               .domain([minDate2, maxDate2])
-              //.range([-13, width-66]); //800-66
               .range([0, width-71]); //800-66
 
           var svg = d3.select("#crime-by-month-2 svg g.chart-body");
@@ -523,7 +465,7 @@ d3.csv("data/crimedata3.csv", function (data) {
               .attr("x1", x(brexitDate))
               .attr("y1", 0)
               .attr("x2", x(brexitDate))
-              .attr("y2", height-50) 
+              .attr("y2", height-50)
 
           svg.append("text")
             .attr("dy", ".35em")
@@ -542,8 +484,6 @@ d3.csv("data/crimedata3.csv", function (data) {
             .attr("fill", "white");
 
         });
-
-
 
         dc.renderAll();
 
