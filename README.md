@@ -3,12 +3,12 @@
 This repository contains the source code for the Coursework about the Brexit effects
 
 
-## Resources
+## Online demo
 
-For presenting the story as a presentation: https://github.com/hakimel/reveal.js
+https://rmgs-soton.github.io/dv-g9-brexit
 
 
 
-## How to run
+## How to run locally
 
 * `python -m SimpleHTTPServer`
