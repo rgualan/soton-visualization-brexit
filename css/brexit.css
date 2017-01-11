@@ -27,6 +27,7 @@ nav.smartscroll-controls {
 	position: fixed;
 	top: 50%;
 	left: 0;
+  z-index: 1;
 }
 
 
@@ -39,8 +40,8 @@ nav.smartscroll-controls > a.prev {
 	border-color: #333333;
     border-style: solid none none solid;
     border-width: 2px;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
     -o-transform: rotate(45deg);
@@ -52,8 +53,8 @@ nav.smartscroll-controls > a.next {
     border-color: #333333;
     border-style: none solid solid none;
     border-width: 2px;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
     -o-transform: rotate(45deg);
@@ -69,8 +70,8 @@ a.smartscroll-totop {
 	border-color: #333333;
     border-style: solid none none solid;
     border-width: 2px;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
     -o-transform: rotate(45deg);
