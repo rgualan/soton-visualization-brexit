@@ -5,8 +5,7 @@ This repository contains the source code for the Coursework about the Brexit eff
 
 ## Online demo
 
-https://rmgs-soton.github.io/dv-g9-brexit
-
+https://rgualan.github.io/dv-g9-brexit/
 
 
 ## How to run locally
