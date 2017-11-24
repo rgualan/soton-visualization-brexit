@@ -4,7 +4,7 @@ This repository contains the source code for a simple visualization entitled: "I
 
 ## Online demo
 
-https://rgualan.github.io/dv-g9-brexit/
+https://rgualan.github.io/visualization-brexit/
 
 
 ## How to run locally
